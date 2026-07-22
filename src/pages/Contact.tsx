@@ -1,6 +1,22 @@
 import { useState, type FormEvent } from "react";
+import { useSearchParams } from "react-router";
 
 function Contact() {
+  const [searchParams] = useSearchParams();
+
+  const selectedTalent = searchParams.get("talent") ?? "";
+  const selectedTalentEmail = searchParams.get("email") ?? "";
+
+  const defaultMessage = selectedTalent
+    ? `Bonjour ${selectedTalent},
+
+Je souhaite échanger avec vous concernant une mission disponible sur Talentra.
+
+Voici quelques informations sur mon besoin :
+
+`
+    : "";
+
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -84,6 +100,34 @@ function Contact() {
           </aside>
 
           <div className="rounded-2xl border border-[#E3E8EF] bg-white p-6 shadow-sm sm:p-8 lg:p-10">
+            {selectedTalent && (
+              <div className="mb-8 rounded-xl border border-[#B8D9EE] bg-[#F1F8FD] p-5">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#0170C1]">
+                  Talent sélectionné
+                </p>
+
+                <div className="mt-3 flex items-center gap-4">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#0170C1] font-bold text-white">
+                    {selectedTalent
+                      .split(" ")
+                      .map((part) => part.charAt(0))
+                      .slice(0, 2)
+                      .join("")
+                      .toUpperCase()}
+                  </div>
+
+                  <div>
+                    <p className="font-bold text-[#0F2742]">{selectedTalent}</p>
+
+                    {selectedTalentEmail && (
+                      <p className="mt-1 text-sm text-[#667085]">
+                        {selectedTalentEmail.toLowerCase()}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-[#0F2742]">
                 Envoyer une demande
@@ -210,15 +254,21 @@ function Contact() {
                     id="subject"
                     name="subject"
                     required
-                    defaultValue=""
+                    defaultValue={selectedTalent ? "contact-talent" : ""}
                     className="mt-2 w-full rounded-lg border border-[#D0D5DD] bg-white px-4 py-3 text-[#172033] outline-none transition focus:border-[#0170C1] focus:ring-4 focus:ring-[#D9EDF9]"
                   >
                     <option value="" disabled>
                       Sélectionnez
                     </option>
+
+                    <option value="contact-talent">Contacter un talent</option>
+
                     <option value="mission">Publier une mission</option>
+
                     <option value="profile">Proposer mon profil</option>
+
                     <option value="partnership">Proposer un partenariat</option>
+
                     <option value="support">Demander une assistance</option>
                   </select>
                 </div>
@@ -235,8 +285,9 @@ function Contact() {
                 <textarea
                   id="message"
                   name="message"
-                  rows={6}
+                  rows={7}
                   required
+                  defaultValue={defaultMessage}
                   placeholder="Décrivez votre besoin, vos objectifs et les principales contraintes du projet."
                   className="mt-2 w-full resize-y rounded-lg border border-[#D0D5DD] bg-white px-4 py-3 text-[#172033] outline-none transition placeholder:text-[#98A2B3] focus:border-[#0170C1] focus:ring-4 focus:ring-[#D9EDF9]"
                 />
